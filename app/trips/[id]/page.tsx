@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { MapPin, Calendar, DollarSign, Users, Phone, Car, MessageCircle, CreditCard } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, CreditCard, DollarSign, MapPin, Phone, Car, MessageCircle, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -119,7 +119,8 @@ export default function TripDetailsPage() {
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="mb-6">
         <Button variant="outline" onClick={() => router.back()}>
-          ← {t("back")}
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {t("back")}
         </Button>
       </div>
 
@@ -137,7 +138,7 @@ export default function TripDetailsPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="text-lg font-semibold">
-              {getCityName(trip.from_city, language)} → {getCityName(trip.to_city, language)}
+              {getCityName(trip.from_city, language)} -&gt; {getCityName(trip.to_city, language)}
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
@@ -147,7 +148,7 @@ export default function TripDetailsPage() {
               </div>
               {trip.departure_time && (
                 <div className="flex items-center space-x-2">
-                  <span className="text-muted-foreground">{t("time")}:</span>
+                  <Clock className="h-4 w-4 text-muted-foreground" />
                   <span>{trip.departure_time}</span>
                 </div>
               )}

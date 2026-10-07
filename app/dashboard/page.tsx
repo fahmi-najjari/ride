@@ -256,7 +256,7 @@ export default function DashboardPage() {
                     <div className="flex items-center space-x-2 mb-2">
                       <MapPin className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">
-                        {getCityName(trip.from_city, language)} → {getCityName(trip.to_city, language)}
+                        {getCityName(trip.from_city, language)} -&gt; {getCityName(trip.to_city, language)}
                       </span>
                     </div>
                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">

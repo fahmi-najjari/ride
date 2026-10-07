@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Car, Menu, X, LogOut } from "lucide-react"
+import { LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LanguageSelector } from "@/components/language-selector"
@@ -22,8 +22,10 @@ export function Navbar() {
     const getUser = async () => {
       try {
         const {
-          data: { user },
-        } = await supabase.auth.getUser()
+          data: { session },
+        } = await supabase.auth.getSession()
+        const user = session?.user ?? null
+
         setUser(user)
 
         if (user) {
@@ -65,13 +67,12 @@ export function Navbar() {
   }
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <Car className="h-8 w-8 text-primary" />
-              <span className="font-bold text-xl">TunisRide</span>
+              <img src="/logo.svg" alt="Tunisia RideShare" className="h-10 w-auto" />
             </Link>
           </div>
 
@@ -92,7 +93,7 @@ export function Navbar() {
                 )}
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-muted-foreground">{profile?.full_name || user.email}</span>
-                  <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  <Button variant="ghost" size="icon" onClick={handleLogout} aria-label={t("logout")}>
                     <LogOut className="h-4 w-4" />
                   </Button>
                 </div>

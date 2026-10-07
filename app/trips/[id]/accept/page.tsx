@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useParams } from "next/navigation"
-import { MapPin, Calendar, DollarSign, Users, Car, AlertCircle } from "lucide-react" // Added AlertCircle
+import { AlertCircle, Calendar, Car, Clock, DollarSign, MapPin, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -230,7 +230,7 @@ export default function AcceptTripPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-lg font-semibold">
-                {getCityName(trip.from_city, language)} → {getCityName(trip.to_city, language)}
+                {getCityName(trip.from_city, language)} -&gt; {getCityName(trip.to_city, language)}
               </span>
               <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
                 {t("pending")}
@@ -244,7 +244,7 @@ export default function AcceptTripPage() {
               </div>
               {trip.departure_time && (
                 <div className="flex items-center space-x-2">
-                  <span className="text-muted-foreground">{t("time")}:</span>
+                  <Clock className="h-4 w-4 text-muted-foreground" />
                   <span>{trip.departure_time}</span>
                 </div>
               )}

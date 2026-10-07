@@ -11,9 +11,11 @@ import { MainContent } from "@/components/main-content"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "TunisRide - Ride Sharing Platform",
-  description: "Connect passengers and drivers across Tunisia",
-    generator: 'v0.dev'
+  title: "Tunisia RideShare",
+  description: "Connect passengers and drivers for intercity trips across Tunisia.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 }
 
 export default function RootLayout({

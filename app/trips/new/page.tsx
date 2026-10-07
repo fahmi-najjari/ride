@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle, CalendarClock, MapPin, Route, Users, Wallet } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { supabase } from "@/lib/supabase/client"
@@ -230,7 +231,11 @@ export default function NewTripPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="font-medium">{t("newTripLoadingTitle")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("newTripLoadingDesc")}</p>
+        </div>
       </div>
     )
   }
@@ -239,6 +244,7 @@ export default function NewTripPage() {
     return (
       <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             <strong>{t("errorLoadingPage")}</strong> {error}
             <div className="mt-2">
@@ -275,16 +281,32 @@ export default function NewTripPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl py-8 px-4 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <Link href="/trips" className="text-sm font-medium text-primary hover:underline">
+          {t("backToTrips")}
+        </Link>
+        <h1 className="mt-3 text-3xl font-bold">{t("postTrip")}</h1>
+        <p className="mt-2 max-w-2xl text-muted-foreground">{t("createNewTripRequestForDrivers")}</p>
+      </div>
+
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl font-bold">{t("postTrip")}</CardTitle>
-          <CardDescription>{t("createNewTripRequestForDrivers")}</CardDescription>
+          <CardTitle className="flex items-center text-xl font-bold">
+            <Route className="mr-2 h-5 w-5 text-primary" />
+            {t("tripInformation")}
+          </CardTitle>
+          <CardDescription>{t("newTripFormDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* From Location */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-lg border bg-card p-4">
+              <div className="mb-4 flex items-center gap-2 font-medium">
+                <MapPin className="h-5 w-5 text-primary" />
+                {t("routeDetails")}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>{t("fromGovernorate")}</Label>
                 <Select
@@ -328,9 +350,15 @@ export default function NewTripPage() {
                 </Select>
               </div>
             </div>
+            </div>
 
             {/* To Location */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-lg border bg-card p-4">
+              <div className="mb-4 flex items-center gap-2 font-medium">
+                <MapPin className="h-5 w-5 text-primary" />
+                {t("destinationDetails")}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>{t("toGovernorate")}</Label>
                 <Select
@@ -374,9 +402,15 @@ export default function NewTripPage() {
                 </Select>
               </div>
             </div>
+            </div>
 
             {/* Date and Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-lg border bg-card p-4">
+              <div className="mb-4 flex items-center gap-2 font-medium">
+                <CalendarClock className="h-5 w-5 text-primary" />
+                {t("schedule")}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="departureDate">{t("date")} *</Label>
                 <Input
@@ -401,9 +435,15 @@ export default function NewTripPage() {
                 />
               </div>
             </div>
+            </div>
 
             {/* Fare and Passengers */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-lg border bg-card p-4">
+              <div className="mb-4 flex items-center gap-2 font-medium">
+                <Wallet className="h-5 w-5 text-primary" />
+                {t("fareAndPassengers")}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="fareOffered">
                   {t("fare")} ({t("tnd")}) *
@@ -440,9 +480,14 @@ export default function NewTripPage() {
                 </Select>
               </div>
             </div>
+            </div>
 
             {/* Notes */}
-            <div className="space-y-2">
+            <div className="rounded-lg border bg-card p-4 space-y-2">
+              <div className="mb-2 flex items-center gap-2 font-medium">
+                <Users className="h-5 w-5 text-primary" />
+                {t("driverNotes")}
+              </div>
               <Label htmlFor="notes">
                 {t("notes")} ({t("optional")})
               </Label>

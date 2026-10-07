@@ -3,7 +3,19 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { MapPin, Calendar, DollarSign, Users, Filter, Plus, Check, ChevronsUpDown } from "lucide-react"
+import {
+  AlertCircle,
+  Calendar,
+  Check,
+  ChevronsUpDown,
+  Clock,
+  DollarSign,
+  Filter,
+  MapPin,
+  Plus,
+  Search,
+  Users,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -25,9 +37,9 @@ export default function TripsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState({
-    governorate: "",
-    fromCity: "",
-    toCity: "",
+    governorate: typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("governorate") || "" : "",
+    fromCity: typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("fromCity") || "" : "",
+    toCity: typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("toCity") || "" : "",
     minFare: "",
     maxFare: "",
     date: "",
@@ -46,16 +58,12 @@ export default function TripsPage() {
         setLoading(true)
         setError(null)
 
-        // Check authentication status
+        // Public visitors can browse trips, so only fetch a user when a session exists.
         const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser()
+          data: { session },
+        } = await supabase.auth.getSession()
 
-        if (authError) {
-          console.error("Auth error:", authError)
-          // Do not redirect, just log the error. User can still view public trips.
-        }
+        const user = session?.user ?? null
 
         let userProfile: Profile | null = null
         if (user) {
@@ -90,10 +98,11 @@ export default function TripsPage() {
         }
 
         setGovernorates(govResponse.data || [])
-        setCities(citiesResponse.data || [])
+        const loadedCities = citiesResponse.data || []
+        setCities(loadedCities)
 
         // Load trips based on user type or for public view
-        await loadTrips(userProfile)
+        await loadTrips(userProfile, loadedCities)
       } catch (error: any) {
         console.error("Page initialization error:", error)
         setError(error.message)
@@ -105,7 +114,7 @@ export default function TripsPage() {
     initializePage()
   }, [router])
 
-  const loadTrips = async (userProfile: Profile | null) => {
+  const loadTrips = async (userProfile: Profile | null, availableCities = cities) => {
     try {
       let query = supabase.from("trips").select(`
         *,
@@ -133,6 +142,15 @@ export default function TripsPage() {
       }
 
       // Apply filters
+      if (filters.governorate && filters.governorate !== "all" && (!filters.fromCity || filters.fromCity === "all")) {
+        const cityIds = availableCities
+          .filter((city) => city.governorate_id === Number.parseInt(filters.governorate))
+          .map((city) => city.id)
+
+        if (cityIds.length > 0) {
+          query = query.in("from_city_id", cityIds)
+        }
+      }
       if (filters.fromCity && filters.fromCity !== "all") {
         query = query.eq("from_city_id", filters.fromCity)
       }
@@ -198,7 +216,8 @@ export default function TripsPage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading trips...</p>
+            <p className="font-medium">{t("tripsLoadingTitle")}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("tripsLoadingDesc")}</p>
           </div>
         </div>
       </div>
@@ -208,12 +227,13 @@ export default function TripsPage() {
   if (error) {
     return (
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mx-auto max-w-3xl">
+          <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Error loading page:</strong> {error}
+            <strong>{t("tripsErrorTitle")}</strong> {error}
             <div className="mt-2">
               <Button variant="outline" onClick={() => window.location.reload()} className="bg-transparent">
-                Try Again
+                {t("tryAgain")}
               </Button>
             </div>
           </AlertDescription>
@@ -229,10 +249,10 @@ export default function TripsPage() {
           <h1 className="text-3xl font-bold">{t("trips")}</h1>
           <p className="text-muted-foreground mt-2">
             {profile?.user_type === "passenger"
-              ? "Manage your trip requests"
+              ? t("tripsPassengerSubtitle")
               : profile?.user_type === "driver"
-                ? "Browse and accept available trips"
-                : "Browse available trips"}
+                ? t("tripsDriverSubtitle")
+                : t("tripsPublicSubtitle")}
           </p>
         </div>
         {profile?.user_type === "passenger" && (
@@ -250,13 +270,13 @@ export default function TripsPage() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Filter className="h-5 w-5 mr-2" />
-            Filters
+            {t("filters")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>Governorate</Label>
+              <Label>{t("selectGovernorate")}</Label>
               <Popover open={openGovernorate} onOpenChange={setOpenGovernorate}>
                 <PopoverTrigger asChild>
                   <Button
@@ -452,7 +472,7 @@ export default function TripsPage() {
 
             <div className="space-y-2">
               <Label>
-                Min {t("fare")} ({t("tnd")})
+                {t("minFare")} ({t("tnd")})
               </Label>
               <Input
                 type="number"
@@ -464,7 +484,7 @@ export default function TripsPage() {
 
             <div className="space-y-2">
               <Label>
-                Max {t("fare")} ({t("tnd")})
+                {t("maxFare")} ({t("tnd")})
               </Label>
               <Input
                 type="number"
@@ -490,11 +510,15 @@ export default function TripsPage() {
       <div className="space-y-6">
         {trips.length === 0 ? (
           <Card>
-            <CardContent className="text-center py-8">
-              <p className="text-muted-foreground mb-4">No trips found</p>
+            <CardContent className="flex flex-col items-center py-12 text-center">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <Search className="h-6 w-6" />
+              </div>
+              <h2 className="text-xl font-semibold">{t("noTripsFound")}</h2>
+              <p className="mt-2 max-w-md text-sm text-muted-foreground">{t("noTripsFoundDesc")}</p>
               {profile?.user_type === "passenger" && (
                 <Link href="/trips/new">
-                  <Button>
+                  <Button className="mt-4">
                     <Plus className="h-4 w-4 mr-2" />
                     {t("postTrip")}
                   </Button>
@@ -503,13 +527,13 @@ export default function TripsPage() {
               {!profile && (
                 <p className="text-sm text-muted-foreground mt-4">
                   <Link href="/register" className="text-primary hover:underline">
-                    Register
+                    {t("register")}
                   </Link>{" "}
-                  or{" "}
+                  {t("or")}{" "}
                   <Link href="/login" className="text-primary hover:underline">
-                    Login
+                    {t("login")}
                   </Link>{" "}
-                  to post a trip or accept rides.
+                  {t("tripsGuestCta")}
                 </p>
               )}
             </CardContent>
@@ -524,7 +548,7 @@ export default function TripsPage() {
                       <div className="flex items-center space-x-2 mb-3">
                         <MapPin className="h-5 w-5 text-primary" />
                         <span className="text-lg font-semibold">
-                          {getCityName(trip.from_city, language)} → {getCityName(trip.to_city, language)}
+                          {getCityName(trip.from_city, language)} -&gt; {getCityName(trip.to_city, language)}
                         </span>
                         <Badge className={getStatusColor(trip.status)}>{t(trip.status as any)}</Badge>
                       </div>
@@ -536,7 +560,7 @@ export default function TripsPage() {
                         </div>
                         {trip.departure_time && (
                           <div className="flex items-center space-x-2">
-                            <span className="text-muted-foreground">Time:</span>
+                            <Clock className="h-4 w-4 text-muted-foreground" />
                             <span>{trip.departure_time}</span>
                           </div>
                         )}
@@ -549,7 +573,8 @@ export default function TripsPage() {
                         <div className="flex items-center space-x-2">
                           <Users className="h-4 w-4 text-muted-foreground" />
                           <span>
-                            {trip.passenger_count} {trip.passenger_count === 1 ? "passenger" : "passengers"}
+                            {trip.passenger_count}{" "}
+                            {trip.passenger_count === 1 ? t("passenger") : t("passengers")}
                           </span>
                         </div>
                       </div>
@@ -562,13 +587,13 @@ export default function TripsPage() {
 
                       <div className="mt-3 text-sm text-muted-foreground">
                         {profile?.user_type === "driver" && (
-                          <span>Passenger: {trip.passenger?.full_name || trip.passenger?.email}</span>
+                          <span>{t("passenger")}: {trip.passenger?.full_name || trip.passenger?.email}</span>
                         )}
                         {profile?.user_type === "passenger" && trip.driver && (
-                          <span>Driver: {trip.driver.full_name || trip.driver.email}</span>
+                          <span>{t("driver")}: {trip.driver.full_name || trip.driver.email}</span>
                         )}
                         {!profile && ( // For unauthenticated users, show generic info
-                          <span>Passenger: {trip.passenger?.full_name || "N/A"}</span>
+                          <span>{t("passenger")}: {trip.passenger?.full_name || t("noDataAvailable")}</span>
                         )}
                       </div>
                     </div>

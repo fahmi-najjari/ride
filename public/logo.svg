@@ -1,0 +1,12 @@
+<svg width="180" height="44" viewBox="0 0 180 44" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Tunisia RideShare</title>
+  <desc id="desc">A teal route pin and car mark with Tunisia RideShare wordmark.</desc>
+  <rect width="44" height="44" rx="10" fill="#147D73"/>
+  <path d="M22 10C16.7 10 12.4 14.1 12.4 19.2C12.4 26.2 22 34 22 34C22 34 31.6 26.2 31.6 19.2C31.6 14.1 27.3 10 22 10Z" fill="white"/>
+  <path d="M16.5 20.3H27.5L25.8 16.9C25.4 16.1 24.6 15.6 23.7 15.6H20.3C19.4 15.6 18.6 16.1 18.2 16.9L16.5 20.3Z" fill="#147D73"/>
+  <path d="M15.5 21.1H28.5V25.4H15.5V21.1Z" fill="#147D73"/>
+  <circle cx="18.4" cy="25.4" r="1.4" fill="white"/>
+  <circle cx="25.6" cy="25.4" r="1.4" fill="white"/>
+  <text x="56" y="19" fill="#112034" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">Tunisia</text>
+  <text x="56" y="34" fill="#147D73" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">RideShare</text>
+</svg>
